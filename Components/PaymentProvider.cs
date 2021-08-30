@@ -199,46 +199,23 @@ namespace OS_Mollie
                 switch (paymentClientResult.Status.ToString().ToLower())
                 {
                     case "open":
-
                         //waiting for bank?
-                        rtnerr = orderData.PurchaseInfo.GetXmlProperty("genxml/paymenterror");
-                        rtnerr = "Mollie open"; // to return this so a fail is activated.
                         return GetReturnTemplate(orderData, false, "Mollie Open");
-
                     case "paid":
-
                         return GetReturnTemplate(orderData, true, "");
-
                     case "failed":
-
-                        rtnerr = orderData.PurchaseInfo.GetXmlProperty("genxml/paymenterror");
-                        rtnerr = "Mollie failed"; // to return this so a fail is activated.
                         return GetReturnTemplate(orderData, false, "Mollie failed");
-
                     case "canceled":
-
-                        rtnerr = orderData.PurchaseInfo.GetXmlProperty("genxml/paymenterror");
-                        rtnerr = "Mollie Canceled"; // to return this so a fail is activated.
                         return GetReturnTemplate(orderData, false, "Mollie canceled");
-
                     case "expired":
-
-                        rtnerr = orderData.PurchaseInfo.GetXmlProperty("genxml/paymenterror");
-                        rtnerr = "Mollie Expired"; // to return this so a fail is activated.
                         return GetReturnTemplate(orderData, false, "Mollie expired");
-
                     default:
-
-                        rtnerr = orderData.PurchaseInfo.GetXmlProperty("genxml/paymenterror");
-                        rtnerr = "Mollie failed"; // to return this so a fail is activated.
                         return GetReturnTemplate(orderData, false, "Mollie failed");
 
                 }
             }
             else
             {
-                rtnerr = orderData.PurchaseInfo.GetXmlProperty("genxml/paymenterror");
-                rtnerr = "Mollie failed"; // to return this so a fail is activated.
                 return GetReturnTemplate(orderData, false, "Mollie failed");
             }
         }
