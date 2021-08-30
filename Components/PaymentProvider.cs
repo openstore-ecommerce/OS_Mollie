@@ -177,22 +177,16 @@ namespace OS_Mollie
         #region ProcessPaymentReturn
         public override string ProcessPaymentReturn(HttpContext context)
         {
-            var info = ProviderUtils.GetProviderSettings();
-            var ApiKey = info.GetXmlProperty("genxml/textbox/key");
             var orderid = Utils.RequestQueryStringParam(context, "orderid");
 
             var objEventLog = new EventLogController();
             PortalSettings portalsettings = new PortalSettings();
 
             var orderData = new OrderData(Convert.ToInt32(orderid));
-            var rtnerr = orderData.PurchaseInfo.GetXmlProperty("genxml/paymenterror");
 
             if (Utils.IsNumeric(orderid))
             {
-                IPaymentClient paymentClient = new PaymentClient(ApiKey);
-                var task = Task.Run(async () => await paymentClient.GetPaymentAsync(orderData.PaymentPassKey));
-                task.Wait();
-                PaymentResponse paymentClientResult = task.Result;
+                PaymentResponse paymentClientResult = ProviderUtils.GetOrderPaymentResponse(orderData, "OS_MolliePaymentProvider.ProcessPaymentReturn");
 
                 objEventLog.AddLog("Mollie ProcessPaymentReturn", "Status: " + paymentClientResult.Status + " OrderId:" + orderid + " Mollie Id: " + orderData.PaymentPassKey, portalsettings, -1, EventLogController.EventLogType.ADMIN_ALERT);
 
