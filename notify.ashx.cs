@@ -35,9 +35,6 @@ namespace OS_Mollie.DNN.NBrightStore
                 var debugMsg = "START CALL" + DateTime.Now.ToString("s") + " </br>";
                 var rtnMsg = "version=2" + Environment.NewLine + "cdr=1";
 
-
-                var providerSettings = ProviderUtils.GetProviderSettings();
-                var ApiKey = providerSettings.GetXmlProperty("genxml/textbox/key");
                 var orderid = Utils.RequestQueryStringParam(context, "orderid");
 
                 debugMsg += "orderid: " + orderid + "</br>";
@@ -48,10 +45,7 @@ namespace OS_Mollie.DNN.NBrightStore
 
                     var orderData = new OrderData(Convert.ToInt32(orderid));
 
-                    IPaymentClient paymentClient = new PaymentClient(ApiKey);
-                    var task = Task.Run(async () => await paymentClient.GetPaymentAsync(orderData.PaymentPassKey));
-                    task.Wait();
-                    PaymentResponse paymentClientResult = task.Result;
+                    PaymentResponse paymentClientResult = ProviderUtils.GetOrderPaymentResponse(orderData, "OS_MollieNotify.ProcessRequest");
 
                     objEventLog.AddLog("Mollie Webhook call for orderid: " + orderid  , "Status: " + paymentClientResult.Status, portalsettings, -1, EventLogController.EventLogType.ADMIN_ALERT);
 

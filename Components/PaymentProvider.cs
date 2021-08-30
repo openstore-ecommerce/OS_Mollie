@@ -177,68 +177,39 @@ namespace OS_Mollie
         #region ProcessPaymentReturn
         public override string ProcessPaymentReturn(HttpContext context)
         {
-            var info = ProviderUtils.GetProviderSettings();
-            var ApiKey = info.GetXmlProperty("genxml/textbox/key");
             var orderid = Utils.RequestQueryStringParam(context, "orderid");
 
             var objEventLog = new EventLogController();
             PortalSettings portalsettings = new PortalSettings();
 
             var orderData = new OrderData(Convert.ToInt32(orderid));
-            var rtnerr = orderData.PurchaseInfo.GetXmlProperty("genxml/paymenterror");
 
             if (Utils.IsNumeric(orderid))
             {
-                IPaymentClient paymentClient = new PaymentClient(ApiKey);
-                var task = Task.Run(async () => await paymentClient.GetPaymentAsync(orderData.PaymentPassKey));
-                task.Wait();
-                PaymentResponse paymentClientResult = task.Result;
+                PaymentResponse paymentClientResult = ProviderUtils.GetOrderPaymentResponse(orderData, "OS_MolliePaymentProvider.ProcessPaymentReturn");
 
                 objEventLog.AddLog("Mollie ProcessPaymentReturn", "Status: " + paymentClientResult.Status + " OrderId:" + orderid + " Mollie Id: " + orderData.PaymentPassKey, portalsettings, -1, EventLogController.EventLogType.ADMIN_ALERT);
 
                 switch (paymentClientResult.Status.ToString().ToLower())
                 {
                     case "open":
-
                         //waiting for bank?
-                        rtnerr = orderData.PurchaseInfo.GetXmlProperty("genxml/paymenterror");
-                        rtnerr = "Mollie open"; // to return this so a fail is activated.
                         return GetReturnTemplate(orderData, false, "Mollie Open");
-
                     case "paid":
-
                         return GetReturnTemplate(orderData, true, "");
-
                     case "failed":
-
-                        rtnerr = orderData.PurchaseInfo.GetXmlProperty("genxml/paymenterror");
-                        rtnerr = "Mollie failed"; // to return this so a fail is activated.
                         return GetReturnTemplate(orderData, false, "Mollie failed");
-
                     case "canceled":
-
-                        rtnerr = orderData.PurchaseInfo.GetXmlProperty("genxml/paymenterror");
-                        rtnerr = "Mollie Canceled"; // to return this so a fail is activated.
                         return GetReturnTemplate(orderData, false, "Mollie canceled");
-
                     case "expired":
-
-                        rtnerr = orderData.PurchaseInfo.GetXmlProperty("genxml/paymenterror");
-                        rtnerr = "Mollie Expired"; // to return this so a fail is activated.
                         return GetReturnTemplate(orderData, false, "Mollie expired");
-
                     default:
-
-                        rtnerr = orderData.PurchaseInfo.GetXmlProperty("genxml/paymenterror");
-                        rtnerr = "Mollie failed"; // to return this so a fail is activated.
                         return GetReturnTemplate(orderData, false, "Mollie failed");
 
                 }
             }
             else
             {
-                rtnerr = orderData.PurchaseInfo.GetXmlProperty("genxml/paymenterror");
-                rtnerr = "Mollie failed"; // to return this so a fail is activated.
                 return GetReturnTemplate(orderData, false, "Mollie failed");
             }
         }
