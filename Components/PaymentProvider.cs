@@ -11,6 +11,7 @@ using DotNetNuke.Common;
 using DotNetNuke.Entities.Portals;
 using DotNetNuke.Entities.Users;
 using DotNetNuke.Services.Log.EventLog;
+using DotNetNuke.Services.Tokens;
 using Mollie.Api.Client;
 using Mollie.Api.Client.Abstract;
 using Mollie.Api.Models;
@@ -59,13 +60,23 @@ namespace OS_Mollie
 
                 var info = ProviderUtils.GetProviderSettings();
 
-                string cartDesc = info.GetXmlProperty("genxml/textbox/cartdescription");
+                string cartDesc = info.GetXmlProperty("genxml/lang/genxml/textbox/paymentdescription");
+                if (string.IsNullOrEmpty(cartDesc)) // default to previous behaviour
+                {
+                    cartDesc = "Bestelling ID: [ORDERNUMBER]";
+                }
                 var ApiKey = info.GetXmlProperty("genxml/textbox/key");
                 var idealOnly = true; // default to previous behaviour
                 if (info.XMLDoc.SelectSingleNode("genxml/checkbox/idealonly") != null)
                 {
                     // take the value from the settings, if it exists
                     idealOnly = info.GetXmlPropertyBool("genxml/checkbox/idealonly");
+                }
+                var addUsername = false; // default to previous behaviour
+                if (info.XMLDoc.SelectSingleNode("genxml/checkbox/addusername") != null)
+                {
+                    // take the value from the settings, if it exists
+                    addUsername = info.GetXmlPropertyBool("genxml/checkbox/addusername");
                 }
                 var notifyUrl = Utils.ToAbsoluteUrl("/DesktopModules/NBright/OS_Mollie/notify.ashx");
                 var returnUrl = Globals.NavigateURL(StoreSettings.Current.PaymentTabId, "");
@@ -74,6 +85,23 @@ namespace OS_Mollie
                 var ItemId = orderData.PurchaseInfo.ItemID.ToString("");
 
                 var productOrderNumber = orderData.OrderNumber;
+                if (cartDesc.Contains("[ORDERNUMBER]"))
+                {
+                    cartDesc = cartDesc.Replace("[ORDERNUMBER]", productOrderNumber);
+                }
+                else
+                {
+                    cartDesc = cartDesc.Trim() + " " + productOrderNumber;
+                }
+
+                if (addUsername)
+                {
+                    var orderUser = UserController.Instance.GetUser(orderData.PortalId, orderData.UserId);
+                    if (!string.IsNullOrEmpty(orderUser?.Username))
+                    {
+                        cartDesc = cartDesc + "/" + orderUser?.Username;
+                    }
+                }
 
                 ////var nbi = new NBrightInfo();
                 //nbi.XMLData = orderData.payselectionXml;
@@ -95,7 +123,7 @@ namespace OS_Mollie
                     IdealPaymentRequest paymentRequestIdeal = new IdealPaymentRequest()
                     {
                         Amount = new Amount(Currency.EUR, totalPrijsString2),
-                        Description = "Bestelling ID: " + " " + productOrderNumber + " " + cartDesc,
+                        Description = cartDesc,
                         RedirectUrl = returnUrl + "/orderid/" + ItemId,
                         WebhookUrl = notifyUrl + "?orderid=" + ItemId,
                         Locale = Locale.nl_NL,

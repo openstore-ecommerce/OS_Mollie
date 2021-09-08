@@ -174,4 +174,19 @@
   <data name="IdealOnlyMessage.Text" xml:space="preserve">
     <value>Skip payment method selection at Mollie and go straight to iDeal bank selection instead.</value>
   </data>
+  <data name="AddUsernameLabel.Text" xml:space="preserve">
+    <value>Add Username</value>
+  </data>
+  <data name="AddUsernameMessage.Text" xml:space="preserve">
+    <value>Add username to payment description on the bank statement</value>
+  </data>
+  <data name="PaymentDescription.Text" xml:space="preserve">
+    <value>Payment description</value>
+  </data>
+  <data name="PaymentDescriptionDefault.Text" xml:space="preserve">
+    <value>Order ID: [ORDERNUMBER]</value>
+  </data>
+  <data name="PaymentDescriptionHelp.Text" xml:space="preserve">
+    <value>Payment description as writen on the bank statement. Use [ORDERNUMBER] for ordernumber. If that's missing, the ordernumber will be written at the end of the description.</value>
+  </data>
 </root>
