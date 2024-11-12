@@ -174,4 +174,19 @@
   <data name="IdealOnlyMessage.Text" xml:space="preserve">
     <value>Keuze voor betaalmethode bij Mollie overslaan en direct het bank-selectie scherm van iDeal tonen.</value>
   </data>
+  <data name="AddUsernameLabel.Text" xml:space="preserve">
+    <value>Gebruikersnaam toevoegen</value>
+  </data>
+  <data name="AddUsernameMessage.Text" xml:space="preserve">
+    <value>Gebruikersnaam toevoegen aan de omschrijving van de betaling op het bankafschrift.</value>
+  </data>
+  <data name="PaymentDescription.Text" xml:space="preserve">
+    <value>Omschrijving betaling</value>
+  </data>
+  <data name="PaymentDescriptionDefault.Text" xml:space="preserve">
+    <value>Bestelling ID: [ORDERNUMBER]</value>
+  </data>
+  <data name="PaymentDescriptionHelp.Text" xml:space="preserve">
+    <value>De omschrijving van de betaling zoals zichtbaar op het bankafschrift. Gebruik [ORDERNUMBER] voor het bestelnummer. Is dat er niet, dan wordt het bestelnummer aan het eind van de omschrijving geplaatst.</value>
+  </data>
 </root>
